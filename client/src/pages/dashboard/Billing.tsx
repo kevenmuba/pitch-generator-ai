@@ -1,54 +1,88 @@
+import { useEffect, useState } from "react";
 import { UserDashboardLayout } from "@/components/layout/UserDashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Zap, Crown, Check } from "lucide-react";
+import { Zap, Crown, Check, Receipt } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/auth.store";
-import { createPendingCreditPurchase, createStripeCheckoutSession } from "@/services/transaction.service";
+import { createPendingCreditPurchase, createStripeCheckoutSession, getTransactions } from "@/services/transaction.service";
 
 const Billing = () => {
   const { toast } = useToast();
   const user = useAuthStore((state) => state.user);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const isUnlimited = user?.isUnlimited === false;
 
   const handlePurchase = async (credits: number) => {
-  if (!user?.id) {
-    toast({
-      title: "Not logged in",
-      description: "Please log in to purchase credits",
-      variant: "destructive",
-    });
-    return;
-  }
+    if (!user?.id) {
+      toast({
+        title: "Not logged in",
+        description: "Please log in to purchase credits",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  try {
-    // Step 1: Create pending transaction
-    const transaction = await createPendingCreditPurchase(credits);
+    try {
+      // Step 1: Create pending transaction
+      const transaction = await createPendingCreditPurchase(credits);
 
-    toast({
-      title: "Pending transaction created",
-      // description: `Transaction ID: ${transaction.id}`,
-      description: `the payment is on progress, you will be redirected to the payment page`,
-      variant: "default",
-    });
+      toast({
+        title: "Pending transaction created",
+        description: `The payment is in progress, you will be redirected to the payment page`,
+        variant: "default",
+      });
 
-    // Step 2: Create Stripe checkout session automatically
-    const session = await createStripeCheckoutSession(transaction.id, credits);
+      // Step 2: Create Stripe checkout session automatically
+      const session = await createStripeCheckoutSession(transaction.id, credits);
 
-    // Step 3: Redirect user to Stripe
-    window.location.href = session.url;
-  } catch (err: any) {
-    toast({
-      title: "Error",
-      description: err.message || "Unable to process payment",
-      variant: "destructive",
-    });
-  }
-};
+      // Step 3: Redirect user to Stripe
+      window.location.href = session.url;
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Unable to process payment",
+        variant: "destructive",
+      });
+    }
+  };
 
+  const fetchTransactions = async () => {
+    setLoading(true);
+    try {
+      const data = await getTransactions();
+      setTransactions(data);
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Unable to fetch transactions",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCompletePayment = async (transactionId: string, credits: number) => {
+    try {
+      const session = await createStripeCheckoutSession(transactionId, credits);
+      window.location.href = session.url;
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Unable to complete payment",
+        variant: "destructive",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
 
   return (
     <UserDashboardLayout>
@@ -96,6 +130,67 @@ const Billing = () => {
               </Button>
             </CardContent>
           </Card>
+        </motion.div>
+
+        {/* Payment History */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <div>
+            <h2 className="font-display text-xl font-semibold mb-4 flex items-center gap-2">
+              <Receipt className="w-5 h-5" />
+              Payment History
+            </h2>
+            <Card variant="glass">
+              <CardContent className="p-0">
+                <table className="w-full">
+  <thead className="bg-muted-foreground/10">
+    <tr>
+      <th className="p-4 text-left">#</th>
+      <th className="p-4 text-left">Credits</th>
+      <th className="p-4 text-left">Amount</th>
+      <th className="p-4 text-left">Status</th>
+      <th className="p-4 text-left">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {loading ? (
+      <tr>
+        <td colSpan={5} className="text-center p-4">Loading...</td>
+      </tr>
+    ) : transactions.length === 0 ? (
+      <tr>
+        <td colSpan={5} className="text-center p-4">No transactions found</td>
+      </tr>
+    ) : (
+      transactions.map((t, index) => (
+        <tr key={t.id} className="border-b border-border/50">
+          <td className="p-4">{index + 1}</td>
+          <td className="p-4">{t.creditsGranted}</td>
+          <td className="p-4">${(t.amountCents / 100).toFixed(2)}</td>
+          <td className="p-4">
+            <Badge variant={t.status === "completed" ? "neon" : "cyan"}>
+              {t.status}
+            </Badge>
+          </td>
+          <td className="p-4">
+            {t.status === "pending" && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleCompletePayment(t.id, t.creditsGranted)}
+              >
+                Complete Payment
+              </Button>
+            )}
+          </td>
+        </tr>
+      ))
+    )}
+  </tbody>
+</table>
+
+              </CardContent>
+            </Card>
+          </div>
         </motion.div>
       </div>
     </UserDashboardLayout>

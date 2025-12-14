@@ -20,38 +20,7 @@ export class TransactionsService {
     });
   }
 
-  async createStripeCheckout(transactionId: string, credits: number) {
-  // Get transaction
-  const transaction = await this.prisma.transaction.findUnique({
-    where: { id: transactionId },
-  });
-
-  if (!transaction) throw new Error('Transaction not found');
-
-  // Amount in cents
-  const amountCents = credits * 100;
-
-  // Create Checkout session
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: { name: `${credits} Credits` },
-          unit_amount: amountCents,
-        },
-        quantity: 1,
-      },
-    ],
-    mode: 'payment',
-    success_url: `${process.env.FRONTEND_URL}/dashboard/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.FRONTEND_URL}/dashboard/billing/cancel`,
-    metadata: { transactionId },
-  });
-
-  return session;
-}
+ 
 
 async completeCreditPurchase(transactionId: string, amountCents: number) {
   const transaction = await this.prisma.transaction.update({
@@ -76,6 +45,40 @@ async getUserTransactions(userId: string) {
     where: { userId },
     orderBy: { createdAt: 'desc' }, 
   });
+}
+
+async createStripeCheckout(transactionId: string) {
+  const transaction = await this.prisma.transaction.findUnique({
+    where: { id: transactionId },
+  });
+
+  if (!transaction) throw new Error('Transaction not found');
+  if (transaction.status === 'completed') {
+    throw new Error('Transaction already completed');
+  }
+
+  const amountCents = transaction.amountCents!;
+  const credits = transaction.creditsGranted!;
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ['card'],
+    line_items: [
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: { name: `${credits} Credits` },
+          unit_amount: amountCents,
+        },
+        quantity: 1,
+      },
+    ],
+    mode: 'payment',
+    success_url: `${process.env.FRONTEND_URL}/dashboard/billing/success`,
+    cancel_url: `${process.env.FRONTEND_URL}/dashboard/billing/cancel`,
+    metadata: { transactionId },
+  });
+
+  return session;
 }
 
 
