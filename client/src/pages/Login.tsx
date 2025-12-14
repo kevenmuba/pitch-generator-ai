@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Rocket, Mail, Lock, ArrowRight, Shield, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuthStore } from "@/store/auth.store";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -16,7 +16,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login, user } = useAuth();
+  const { login, user } = useAuthStore();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -29,42 +29,20 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    const result = await login(email, password);
-
-    setIsLoading(false);
-
-    if (result.success) {
+    try {
+      await login(email, password);
       toast({
         title: "Welcome back!",
         description: "Redirecting to your dashboard...",
       });
-    } else {
+    } catch (err: any) {
       toast({
         title: "Login failed",
-        description: result.error,
+        description: err?.message || "Invalid email or password",
         variant: "destructive",
       });
-    }
-  };
-
-  const handleQuickLogin = async (type: "admin" | "user") => {
-    const credentials = type === "admin" 
-      ? { email: "admin@demo.com", password: "demo" }
-      : { email: "user@demo.com", password: "demo" };
-    
-    setEmail(credentials.email);
-    setPassword(credentials.password);
-    setIsLoading(true);
-
-    const result = await login(credentials.email, credentials.password);
-    
-    setIsLoading(false);
-    
-    if (result.success) {
-      toast({
-        title: `Welcome, ${type === "admin" ? "Admin" : "User"}!`,
-        description: "Redirecting to your dashboard...",
-      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -95,46 +73,6 @@ const Login = () => {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Quick Login Buttons */}
-            <div className="space-y-3">
-              <p className="text-xs text-center text-muted-foreground">Quick Demo Access</p>
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  variant="outline"
-                  className="h-auto py-3 flex flex-col items-center gap-1"
-                  onClick={() => handleQuickLogin("admin")}
-                  disabled={isLoading}
-                >
-                  <Shield className="w-5 h-5 text-neon-purple" />
-                  <span className="text-sm font-medium">Admin Login</span>
-                  <Badge variant="neon" className="text-[10px] px-2 py-0">
-                    Full Access
-                  </Badge>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-auto py-3 flex flex-col items-center gap-1"
-                  onClick={() => handleQuickLogin("user")}
-                  disabled={isLoading}
-                >
-                  <User className="w-5 h-5 text-neon-cyan" />
-                  <span className="text-sm font-medium">User Login</span>
-                  <Badge variant="cyan" className="text-[10px] px-2 py-0">
-                    3 Credits
-                  </Badge>
-                </Button>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">Or enter credentials</span>
-              </div>
-            </div>
-
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>

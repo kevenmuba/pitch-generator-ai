@@ -18,5 +18,35 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
 
-  // Relations will be added later
+ transactions  Transaction[]
+  subscriptions Subscription[]
 }
+
+model Transaction {
+  id              String   @id @default(uuid())
+  userId          String
+  stripePaymentId String?
+  type            String   // credit_purchase | subscription | refund
+  amountCents     Int?
+  creditsGranted  Int?
+  status          String   // pending | completed | failed
+  metadata        Json?
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id                     String   @id @default(uuid())
+  userId                 String
+  stripeSubscriptionId   String
+  status                 String   // active | canceled | past_due
+  plan                   String   // unlimited | single_course
+  startDate              DateTime
+  endDate                DateTime?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+

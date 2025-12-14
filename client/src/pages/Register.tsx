@@ -8,18 +8,19 @@ import { Badge } from "@/components/ui/badge";
 import { Rocket, Mail, Lock, User, ArrowRight, Sparkles, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuthStore } from "@/store/auth.store";
 
 const Register = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const { register, user, loading, error } = useAuthStore();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { register, user } = useAuth();
 
-  // Redirect if already logged in
+  // Redirect if logged in already
   useEffect(() => {
     if (user) {
       navigate(user.role === "admin" ? "/admin" : "/dashboard");
@@ -28,21 +29,20 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    const result = await register(name, email, password);
+    try {
+      await register(email, password, name); // role defaults to "user"
 
-    setIsLoading(false);
-
-    if (result.success) {
       toast({
-        title: "Welcome to PitchRocket! 🚀",
-        description: "Your account is ready with 5 free generations.",
+        title: "Account created! 🚀",
+        description: "Welcome to PitchRocket. Your free trial is activated.",
       });
-    } else {
+
+      navigate("/dashboard");
+    } catch (err: any) {
       toast({
         title: "Registration failed",
-        description: result.error,
+        description: error || err.message || "Something went wrong",
         variant: "destructive",
       });
     }
@@ -76,6 +76,7 @@ const Register = () => {
               </div>
               <span className="font-display font-bold text-xl">PitchRocket</span>
             </Link>
+
             <div>
               <CardTitle className="text-2xl flex items-center justify-center gap-2">
                 Start Free Trial
@@ -84,6 +85,7 @@ const Register = () => {
               <CardDescription>Create your account and get started instantly</CardDescription>
             </div>
           </CardHeader>
+
           <CardContent className="space-y-6">
             {/* Free Trial Benefits */}
             <div className="bg-neon-purple/10 rounded-xl p-4 border border-neon-purple/20">
@@ -91,6 +93,7 @@ const Register = () => {
                 <Badge variant="neon">FREE TRIAL</Badge>
                 <span className="text-sm text-muted-foreground">No payment required</span>
               </div>
+
               <ul className="space-y-2">
                 {freeTrialFeatures.map((feature, i) => (
                   <motion.li
@@ -108,6 +111,7 @@ const Register = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Name */}
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <div className="relative">
@@ -124,6 +128,7 @@ const Register = () => {
                 </div>
               </div>
 
+              {/* Email */}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -140,6 +145,7 @@ const Register = () => {
                 </div>
               </div>
 
+              {/* Password */}
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -152,14 +158,20 @@ const Register = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10"
                     required
-                    minLength={8}
+                    minLength={6}
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">Minimum 8 characters</p>
               </div>
 
-              <Button type="submit" variant="hero" size="lg" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating account..." : "Start Free Trial"}
+              <Button
+                type="submit"
+                variant="hero"
+                size="lg"
+                className="w-full"
+                disabled={loading}
+              >
+                {loading ? "Creating account..." : "Start Free Trial"}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </form>

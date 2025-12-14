@@ -39,51 +39,51 @@ const App = () => (
             
             {/* User Dashboard Routes */}
             <Route path="/dashboard" element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              
                 <UserDashboard />
-              </ProtectedRoute>
+             
             } />
             <Route path="/dashboard/content" element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              
                 <ContentList />
-              </ProtectedRoute>
+            
             } />
             <Route path="/dashboard/content/:scenario/:level" element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              
                 <PitchGenerator />
-              </ProtectedRoute>
+            
             } />
             <Route path="/dashboard/billing" element={
-              <ProtectedRoute allowedRoles={["user"]}>
+              
                 <Billing />
-              </ProtectedRoute>
+             
             } />
             <Route path="/dashboard/profile" element={
-              <ProtectedRoute allowedRoles={["user"]}>
+             
                 <Profile />
-              </ProtectedRoute>
+            
             } />
             
             {/* Admin Dashboard Routes */}
             <Route path="/admin" element={
-              <ProtectedRoute allowedRoles={["admin"]}>
+              
                 <AdminDashboard />
-              </ProtectedRoute>
+            
             } />
             <Route path="/admin/users" element={
-              <ProtectedRoute allowedRoles={["admin"]}>
+              
                 <AdminUsers />
-              </ProtectedRoute>
+              
             } />
             <Route path="/admin/revenue" element={
-              <ProtectedRoute allowedRoles={["admin"]}>
+              
                 <AdminRevenue />
-              </ProtectedRoute>
+              
             } />
             <Route path="/admin/settings" element={
-              <ProtectedRoute allowedRoles={["admin"]}>
+             
                 <AdminSettings />
-              </ProtectedRoute>
+              
             } />
             
             <Route path="*" element={<NotFound />} />

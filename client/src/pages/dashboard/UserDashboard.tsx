@@ -15,6 +15,7 @@ import {
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAuthStore } from "@/store/auth.store";
 
 const quickScenarios = [
   {
@@ -50,8 +51,9 @@ const recentPitches = [
 ];
 
 const UserDashboard = () => {
-  const { user } = useAuth();
-  const isUnlimited = user?.plan === "unlimited";
+  // const { user } = useAuth();
+  const user = useAuthStore((state) => state.user);
+  const isUnlimited = user?.name === "admin";
   const creditsRemaining = user?.credits || 0;
 
   return (

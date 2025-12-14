@@ -1,6 +1,6 @@
 import { Controller, Get, Patch, Body, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // ✅ correct path
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -8,14 +8,22 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  getProfile(@Req() req) {
-    
-    return this.usersService.findById(req.user.userId);
+  async getProfile(@Req() req) {
+    // use userId from JwtStrategy.validate
+    const user = await this.usersService.findById(req.user.id);
+    if (!user) {
+      return { message: 'User not found' };
+    }
+    const { passwordHash, ...safeUser } = user;
+    return safeUser;
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('me')
-  updateProfile(@Req() req, @Body() data: { name?: string; email?: string }) {
-    return this.usersService.updateProfile(req.user.userId, data);
+  async updateProfile(@Req() req, @Body() data: { name?: string; email?: string }) {
+    const updated = await this.usersService.updateProfile(req.user.id, data);
+    const { passwordHash, ...safeUser } = updated;
+    return safeUser;
   }
 }
+

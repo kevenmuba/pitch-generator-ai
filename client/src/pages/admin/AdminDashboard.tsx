@@ -31,6 +31,7 @@ const monthlyData = [
 ];
 
 const AdminDashboard = () => {
+  
   return (
     <AdminDashboardLayout>
       <div className="space-y-8">

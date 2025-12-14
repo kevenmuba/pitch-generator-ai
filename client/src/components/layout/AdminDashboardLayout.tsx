@@ -15,7 +15,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuthStore } from "@/store/auth.store";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
@@ -33,7 +33,7 @@ export function AdminDashboardLayout({ children }: AdminDashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+   const logout = useAuthStore((state) => state.logout);
 
   const handleLogout = () => {
     logout();

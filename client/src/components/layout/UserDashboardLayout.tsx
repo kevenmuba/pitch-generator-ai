@@ -14,7 +14,8 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuthStore } from "@/store/auth.store";
+
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
@@ -32,7 +33,8 @@ export function UserDashboardLayout({ children }: UserDashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const logout = useAuthStore((state) => state.logout);
+
 
   const handleLogout = () => {
     logout();
