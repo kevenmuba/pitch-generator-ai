@@ -1,21 +1,22 @@
+// src/services/transaction.service.ts
 import api from "./api";
 
 /**
  * 1️⃣ Create pending credit purchase
  * POST /transactions/credit-purchase
  */
-export const createCreditPurchase = async (credits: number) => {
+export const createPendingCreditPurchase = async (credits: number) => {
   const res = await api.post("/transactions/credit-purchase", {
     credits,
   });
-  return res.data;
+  return res.data; // returns transaction object
 };
 
 /**
  * 2️⃣ Create Stripe checkout session
  * POST /transactions/credit-purchase/checkout
  */
-export const createStripeCheckout = async (
+export const createStripeCheckoutSession = async (
   transactionId: string,
   credits: number
 ) => {
@@ -23,13 +24,12 @@ export const createStripeCheckout = async (
     transactionId,
     credits,
   });
-  return res.data; // returns Stripe session
+  return res.data; // Stripe session (has .url)
 };
 
 /**
- * 3️⃣ Get user transaction history
+ * 3️⃣ (Future) Get user transactions
  * GET /transactions
- * (you will implement this backend endpoint later)
  */
 export const getTransactions = async () => {
   const res = await api.get("/transactions");

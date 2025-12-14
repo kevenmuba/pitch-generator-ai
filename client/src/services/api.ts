@@ -1,13 +1,14 @@
-// src/services/api.ts
 import axios from "axios";
+import { useAuthStore } from "@/store/auth.store";
 
 const api = axios.create({
   baseURL: "http://localhost:3000", // your NestJS backend
 });
 
-// Automatically attach token
+// Automatically attach token from Zustand store
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = useAuthStore.getState().token;
+  console.log("Sending token:", token);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

@@ -15,6 +15,7 @@ model User {
   role         String   @default("user")
   credits      Int      @default(0)
   trialCredits Int      @default(5) @map("trial_credits")
+  isUnlimited  Boolean  @default(false) @map("is_unlimited")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
 

@@ -11,6 +11,8 @@ interface User {
   role: string;
   credits: number;
   trialCredits: number;
+  isUnlimited: boolean;
+  createdAt: string;
 }
 
 interface AuthState {
@@ -29,7 +31,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      user: null,
+    user: null,
       token: null,
       loading: false,
       error: null,

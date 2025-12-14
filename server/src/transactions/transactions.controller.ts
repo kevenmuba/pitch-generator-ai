@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req,Headers } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req,Headers ,Get} from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateCreditPurchaseDto } from './dto/create-credit-purchase.dto';
@@ -28,6 +28,7 @@ async checkout(@Req() req, @Body() body: { transactionId: string, credits: numbe
   @Post('webhook')
   async handleWebhook(@Req() req, @Headers('stripe-signature') signature: string) {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+      // console.log('🔥 Webhook endpoint HIT');
     let event: Stripe.Event;
 
     try {
@@ -51,5 +52,12 @@ async checkout(@Req() req, @Body() body: { transactionId: string, credits: numbe
 
     return { received: true };
   }
+
+  @UseGuards(JwtAuthGuard)
+ @Get()
+async getMyTransactions(@Req() req) {
+  return this.transactionsService.getUserTransactions(req.user.id);
+}
+
 
 }

@@ -45,8 +45,8 @@ export class TransactionsService {
       },
     ],
     mode: 'payment',
-    success_url: `${process.env.FRONTEND_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.FRONTEND_URL}/billing/cancel`,
+    success_url: `${process.env.FRONTEND_URL}/dashboard/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.FRONTEND_URL}/dashboard/billing/cancel`,
     metadata: { transactionId },
   });
 
@@ -69,6 +69,13 @@ await this.prisma.user.update({
 
 
   return transaction;
+}
+
+async getUserTransactions(userId: string) {
+  return this.prisma.transaction.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' }, 
+  });
 }
 
 

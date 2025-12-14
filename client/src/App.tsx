@@ -20,6 +20,8 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminRevenue from "./pages/admin/AdminRevenue";
 import AdminSettings from "./pages/admin/AdminSettings";
 import NotFound from "./pages/NotFound";
+import BillingSuccess from "./pages/dashboard/billing/success";
+import BillingCancel from "./pages/dashboard/billing/BillingCancel";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +58,18 @@ const App = () => (
             <Route path="/dashboard/billing" element={
               
                 <Billing />
+             
+            } />
+
+            <Route path="/dashboard/billing/success" element={
+              
+                <BillingSuccess/>
+             
+            } />
+
+            <Route path="/dashboard/billing/cancel" element={
+              
+                <BillingCancel/>
              
             } />
             <Route path="/dashboard/profile" element={
