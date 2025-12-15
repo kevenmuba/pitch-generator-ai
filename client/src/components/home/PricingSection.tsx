@@ -29,7 +29,7 @@ export function PricingSection() {
   const handleClick = () => {
     if (user?.id) {
       // Navigate to billing/payment page
-      navigate("/billing");
+      navigate("/dashboard/billing");
     } else {
       // Navigate to login page
       navigate("/login");

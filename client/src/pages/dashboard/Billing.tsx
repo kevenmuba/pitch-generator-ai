@@ -125,7 +125,7 @@ const Billing = () => {
                   <Check className="w-4 h-4 text-neon-cyan" /> 1 additional generation
                 </li>
               </ul>
-              <Button variant="outline" className="w-full" onClick={() => handlePurchase(1)}>
+              <Button variant="outline" className="w-full bg-gradient-to-r from-neon-purple to-neon-cyan text-white hover:scale-105 transition-transform duration-200" onClick={() => handlePurchase(1)}>
                 Buy Credit
               </Button>
             </CardContent>
