@@ -9,7 +9,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  Shield
+  Shield,
+  FileText
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -22,6 +23,7 @@ const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
   { icon: Users, label: "Users", href: "/admin/users" },
   { icon: DollarSign, label: "Revenue", href: "/admin/revenue" },
+  { icon: FileText, label: "Templates", href: "/admin/templates" },
   { icon: Settings, label: "Settings", href: "/admin/settings" },
 ];
 

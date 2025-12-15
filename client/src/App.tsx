@@ -22,6 +22,7 @@ import AdminSettings from "./pages/admin/AdminSettings";
 import NotFound from "./pages/NotFound";
 import BillingSuccess from "./pages/dashboard/billing/success";
 import BillingCancel from "./pages/dashboard/billing/BillingCancel";
+import AdminTemplates from "./pages/admin/templates";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +93,11 @@ const App = () => (
             <Route path="/admin/revenue" element={
               
                 <AdminRevenue />
+              
+            } />
+            <Route path="/admin/templates" element={
+             
+                <AdminTemplates />
               
             } />
             <Route path="/admin/settings" element={
