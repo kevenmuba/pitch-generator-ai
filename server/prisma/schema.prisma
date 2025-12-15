@@ -7,6 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+////////////////////
+/// EXISTING MODELS (UNCHANGED)
+////////////////////
+
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
@@ -19,8 +23,10 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
 
- transactions  Transaction[]
-  subscriptions Subscription[]
+  transactions   Transaction[]
+  subscriptions  Subscription[]
+  lessons        UserLesson[]
+  templates      Template[]
 }
 
 model Transaction {
@@ -51,3 +57,37 @@ model Subscription {
   user User @relation(fields: [userId], references: [id])
 }
 
+////////////////////
+/// STEP 3 MODELS (NEW)
+////////////////////
+
+model Template {
+  id         String   @id @default(uuid())
+  title      String
+  scenario   String   // dating | cold_call | business
+  skillLevel String   @map("skill_level") // basic | intermediate | advanced
+  promptText String   @map("prompt_text")
+  isPublic   Boolean  @default(true) @map("is_public")
+
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model UserLesson {
+  id           String   @id @default(uuid())
+  userId       String
+  scenario     String   // dating | cold_call | business
+  skillLevel   String   @map("skill_level") // basic | intermediate | advanced
+  currentPhase Int      @default(1) @map("current_phase")
+  status       String   @default("active") // active | completed
+
+  startedAt DateTime @default(now()) @map("started_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, scenario, skillLevel])
+}
