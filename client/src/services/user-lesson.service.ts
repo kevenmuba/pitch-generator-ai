@@ -23,6 +23,19 @@ export const getUserLessons = async () => {
 };
 
 /**
+ * 3️⃣ Get a specific lesson by ID ✅ (NEW)
+ * GET /user-lessons/:id
+ */
+export const getUserLessonById = async (id: string) => {
+  const res = await api.get(`/user-lessons/${id}`);
+  return res.data; // UserLesson
+};
+
+
+// src/user-lessons/user-lessons.service.ts
+
+
+/**
  * 3️⃣ Update a lesson (phase or status)
  * PATCH /user-lessons/:id
  */

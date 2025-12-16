@@ -91,3 +91,4 @@ model UserLesson {
 
   @@unique([userId, scenario, skillLevel])
 }
+

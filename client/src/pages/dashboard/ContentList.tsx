@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { getTemplates } from "@/services/template.service";
 import { useToast } from "@/hooks/use-toast";
+import { createUserLesson } from "@/services/user-lesson.service";
+import { useNavigate } from "react-router-dom";
 
 type Template = {
   id: string;
@@ -33,6 +35,32 @@ const ContentList = () => {
   const { toast } = useToast();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
+ const navigate = useNavigate();
+
+ const handleContentClick = async (scenario: string, skillLevel: string) => {
+  try {
+    const lesson = await createUserLesson({
+      scenario,
+      skillLevel,
+    });
+
+    // Navigate to lesson detail
+    navigate(`/dashboard/lesson/${lesson.id}`);
+  } catch (err: any) {
+    // If lesson already exists, backend should return existing lesson
+    const existingLessonId = err?.response?.data?.lessonId;
+
+    if (existingLessonId) {
+      navigate(`/dashboard/lesson/${existingLessonId}`);
+    } else {
+      toast({
+        title: "Unable to start lesson",
+        description: "Please try again",
+      });
+    }
+  }
+};
+
 
   const fetchTemplates = async () => {
     setLoading(true);
@@ -120,8 +148,9 @@ const ContentList = () => {
                     (t) => t.skillLevel.toLowerCase() === level
                   );
                   return templatesForLevel.map((t) => (
-                    <Link key={t.id} to={`/dashboard/content/${t.scenario}/${t.skillLevel}/${t.id}`}>
-                      <Card variant="glass" className="hover-lift cursor-pointer group">
+                   
+                      <Card variant="glass" className="hover-lift cursor-pointer group"
+                        onClick={() => handleContentClick(t.scenario, t.skillLevel)}>
                         <CardContent className="p-5 flex items-center justify-between">
                           <div>
                             <p className="font-medium mb-1">{t.title}</p>
@@ -137,7 +166,7 @@ const ContentList = () => {
                           <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
                         </CardContent>
                       </Card>
-                    </Link>
+                  
                   ));
                 })}
               </div>

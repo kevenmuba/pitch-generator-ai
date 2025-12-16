@@ -23,6 +23,8 @@ import NotFound from "./pages/NotFound";
 import BillingSuccess from "./pages/dashboard/billing/success";
 import BillingCancel from "./pages/dashboard/billing/BillingCancel";
 import AdminTemplates from "./pages/admin/templates";
+import Lesson from "./pages/dashboard/Lesson";
+import LessonDetail from "./pages/dashboard/lesson-detail";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +51,19 @@ const App = () => (
             <Route path="/dashboard/content" element={
               
                 <ContentList />
+            
+            } />
+
+            <Route
+  path="/dashboard/lesson/:lessonId"
+  element={<LessonDetail />}
+/>
+
+
+            
+            <Route path="/dashboard/lesson" element={
+              
+                <Lesson />
             
             } />
             <Route path="/dashboard/content/:scenario/:level" element={

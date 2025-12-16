@@ -32,6 +32,12 @@ export class UserLessonsController {
     return this.userLessonsService.findAll(req.user.id);
   }
 
+  @Get(':id')
+findOne(@Req() req, @Param('id') id: string) {
+  return this.userLessonsService.findOne(req.user.id, id);
+}
+
+
   // 3️⃣ Update lesson phase/completion
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateUserLessonDto) {

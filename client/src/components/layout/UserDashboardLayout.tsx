@@ -9,7 +9,8 @@ import {
   User,
   LogOut,
   Menu,
-  X
+  X,
+  BookOpen
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -21,6 +22,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: FileText, label: "Content List", href: "/dashboard/content" },
+  { icon: BookOpen, label: "Lessons", href: "/dashboard/lesson" },
   { icon: CreditCard, label: "Billing", href: "/dashboard/billing" },
   { icon: User, label: "Profile", href: "/dashboard/profile" },
 ];
