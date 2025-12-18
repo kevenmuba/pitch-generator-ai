@@ -38,4 +38,18 @@ export class UsersService {
   updateProfile(id: string, data: { name?: string; email?: string }) {
     return this.prisma.user.update({ where: { id }, data });
   }
+
+  async getUserCredits(userId: string) {
+  return this.prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      credits: true,
+      trialCredits: true,
+      isUnlimited: true,
+    },
+  });
+}
+
+
+
 }

@@ -23,20 +23,21 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
 
-  transactions   Transaction[]
-  subscriptions  Subscription[]
-  lessons        UserLesson[]
-  templates      Template[]
+  transactions  Transaction[]
+  subscriptions Subscription[]
+  lessons       UserLesson[]
+  templates     Template[]
+  pitches       Pitch[]
 }
 
 model Transaction {
   id              String   @id @default(uuid())
   userId          String
   stripePaymentId String?
-  type            String   // credit_purchase | subscription | refund
+  type            String // credit_purchase | subscription | refund
   amountCents     Int?
   creditsGranted  Int?
-  status          String   // pending | completed | failed
+  status          String // pending | completed | failed
   metadata        Json?
   createdAt       DateTime @default(now())
 
@@ -44,15 +45,15 @@ model Transaction {
 }
 
 model Subscription {
-  id                     String   @id @default(uuid())
-  userId                 String
-  stripeSubscriptionId   String
-  status                 String   // active | canceled | past_due
-  plan                   String   // unlimited | single_course
-  startDate              DateTime
-  endDate                DateTime?
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  id                   String    @id @default(uuid())
+  userId               String
+  stripeSubscriptionId String
+  status               String // active | canceled | past_due
+  plan                 String // unlimited | single_course
+  startDate            DateTime
+  endDate              DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -62,33 +63,63 @@ model Subscription {
 ////////////////////
 
 model Template {
-  id         String   @id @default(uuid())
+  id         String  @id @default(uuid())
   title      String
-  scenario   String   // dating | cold_call | business
-  skillLevel String   @map("skill_level") // basic | intermediate | advanced
-  promptText String   @map("prompt_text")
-  isPublic   Boolean  @default(true) @map("is_public")
+  scenario   String // dating | cold_call | business
+  skillLevel String  @map("skill_level") // basic | intermediate | advanced
+  promptText String  @map("prompt_text")
+  isPublic   Boolean @default(true) @map("is_public")
 
   createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdBy   User    @relation(fields: [createdById], references: [id])
+  pitches     Pitch[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 }
 
 model UserLesson {
-  id           String   @id @default(uuid())
-  userId       String
-  scenario     String   // dating | cold_call | business
-  skillLevel   String   @map("skill_level") // basic | intermediate | advanced
-  currentPhase Int      @default(1) @map("current_phase")
-  status       String   @default("active") // active | completed
+  id         String   @id @default(uuid())
+  userId     String
+  scenario   String
+  skillLevel String   @map("skill_level")
+
+  currentPhase Int    @default(1) @map("current_phase")
+  totalPhases  Int    @default(2) @map("total_phases")
+
+  status   String @default("in_progress")
 
   startedAt DateTime @default(now()) @map("started_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  pitches Pitch[]   // ✅ ADD THIS LINE
 
   @@unique([userId, scenario, skillLevel])
 }
+
+model Pitch {
+  id         String  @id @default(uuid())
+  userId     String
+  lessonId   String?
+  templateId String?
+
+  scenario   String
+  skillLevel String @map("skill_level")
+  phase      Int
+
+  promptUsed String @map("prompt_used")
+  resultText String @map("result_text")
+
+  costCredits Int @map("cost_credits")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user     User        @relation(fields: [userId], references: [id])
+  template Template?   @relation(fields: [templateId], references: [id])
+  lesson   UserLesson? @relation(fields: [lessonId], references: [id])
+
+  @@index([userId, scenario, skillLevel, phase])
+}
+
 

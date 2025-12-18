@@ -1,11 +1,16 @@
-import { IsOptional, IsInt, IsString } from 'class-validator';
+import { IsOptional, IsInt, IsEnum } from 'class-validator';
+
+export enum LessonStatus {
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed',
+}
 
 export class UpdateUserLessonDto {
   @IsInt()
   @IsOptional()
-  currentPhase?: number;
+  currentPhase?: number;  // ✅ updated
 
-  @IsString()
+  @IsEnum(LessonStatus)
   @IsOptional()
-  status?: string; // active | completed
+  status?: LessonStatus;
 }

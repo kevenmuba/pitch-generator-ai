@@ -1,11 +1,16 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+
+export enum SkillLevel {
+  BASIC = 'basic',
+  INTERMEDIATE = 'intermediate',
+  ADVANCED = 'advanced',
+}
 
 export class CreateUserLessonDto {
   @IsString()
   @IsNotEmpty()
-  scenario: string; // dating | cold_call | business
+  scenario: string;
 
-  @IsString()
-  @IsNotEmpty()
-  skillLevel: string; // basic | intermediate | advanced
+  @IsEnum(SkillLevel)
+  skillLevel: SkillLevel;
 }

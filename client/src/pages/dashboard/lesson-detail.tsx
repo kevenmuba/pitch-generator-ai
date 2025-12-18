@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Sparkles } from "lucide-react";
 import { getUserLessonById } from "@/services/user-lesson.service";
 import { useToast } from "@/hooks/use-toast";
+import { generatePitch } from "@/services/pitch.service";
 
 type UserLesson = {
   id: string;
@@ -22,6 +23,9 @@ const MAX_PHASES = 3;
 const LessonDetail = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
   const { toast } = useToast();
+
+  const [aiPitch, setAiPitch] = useState<string | null>(null);
+const [generating, setGenerating] = useState(false);
 
   const [lesson, setLesson] = useState<UserLesson | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,6 +47,53 @@ const LessonDetail = () => {
       setLoading(false);
     }
   };
+
+//   const handleGeneratePitch = async () => {
+//   if (!lesson) return;
+//   setGenerating(true);
+//   try {
+//     const pitch = await generatePitch({
+//       scenario: lesson.scenario,
+//       skillLevel: lesson.skillLevel,
+//       phase: lesson.currentPhase,
+//     });
+//     setAiPitch(pitch.resultText);
+//   } catch (err: any) {
+//     console.error(err);
+//     toast({
+//       title: "Error generating pitch",
+//       description: err?.response?.data?.message || "Something went wrong",
+//     });
+//   } finally {
+//     setGenerating(false);
+//   }
+// };
+
+
+const handleGeneratePitch = async () => {
+  if (!lesson) return;
+  setGenerating(true);
+  try {
+    const pitch = await generatePitch({
+      scenario: lesson.scenario,
+      skillLevel: lesson.skillLevel.toLowerCase(), // important!
+      phase: Number(lesson.currentPhase),         // ensure number
+      tone: "confident",                          // optional, default
+      length: "medium",                           // optional, default
+    });
+    setAiPitch(pitch.resultText);
+  } catch (err: any) {
+    console.error("Pitch generation error:", err);
+    toast({
+      title: "Error generating pitch",
+      description:
+        err?.response?.data?.message || err.message || "Something went wrong",
+    });
+  } finally {
+    setGenerating(false);
+  }
+};
+
 
   useEffect(() => {
     fetchLesson();
@@ -141,10 +192,23 @@ const LessonDetail = () => {
                 When you’re ready, generate an AI-guided pitch to continue.
               </p>
 
-              <Button className="gap-2">
-                <Sparkles className="w-4 h-4" />
-                Generate AI Guide
-              </Button>
+              <Button className="gap-2" onClick={handleGeneratePitch} disabled={generating}>
+  <Sparkles className="w-4 h-4" />
+  {generating ? "Generating..." : "Generate AI Guide"}
+</Button>
+
+{/* Render AI Pitch */}
+{aiPitch && (
+  <Card className="mt-4">
+    <CardContent>
+      <h3 className="text-lg font-semibold mb-2">AI Guidance:</h3>
+      <div className="whitespace-pre-wrap text-muted-foreground">
+        {aiPitch}
+      </div>
+    </CardContent>
+  </Card>
+)}
+
             </CardContent>
           </Card>
         </motion.div>

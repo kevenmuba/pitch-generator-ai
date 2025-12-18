@@ -25,5 +25,27 @@ export class UsersController {
     const { passwordHash, ...safeUser } = updated;
     return safeUser;
   }
+
+
+  @UseGuards(JwtAuthGuard)
+@Get('credits')
+async getCredits(@Req() req) {
+  const data = await this.usersService.getUserCredits(req.user.id);
+
+  if (!data) {
+    return { message: 'User not found' };
+  }
+
+  return {
+    credits: data.credits ?? 0,
+    trialCredits: data.trialCredits ?? 0,
+    totalCredits: (data.credits ?? 0) + (data.trialCredits ?? 0),
+    isUnlimited: data.isUnlimited,
+  };
+}
+
+
+
+
 }
 
