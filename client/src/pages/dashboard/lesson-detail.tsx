@@ -81,7 +81,7 @@ const LessonDetail = () => {
         phase: Number(lesson.currentPhase),
         tone: "confident",
         length: "medium",
-        lessonId: lesson.id, // important
+        lessonId: lesson.id, 
       });
       setAiPitch(pitch.resultText);
       fetchPitches(); // refresh pitch list
@@ -143,34 +143,7 @@ const LessonDetail = () => {
           </p>
         </motion.div>
 
-        {/* Lesson Info */}
-        <Card>
-          <CardContent className="space-y-4">
-            <div className="flex flex-wrap gap-3">
-              <Badge className={getSkillBadgeColor(lesson.skillLevel)}>
-                {lesson.skillLevel.toUpperCase()}
-              </Badge>
-              <Badge variant="secondary">
-                Phase {lesson.currentPhase} of {MAX_PHASES}
-              </Badge>
-              <Badge variant="outline">{lesson.status}</Badge>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Progress</span>
-                <span>{Math.round(progressPercentage)}%</span>
-              </div>
-              <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-indigo-500 transition-all"
-                  style={{ width: `${progressPercentage}%` }}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+  
 
         {/* Phase Content */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
@@ -179,7 +152,7 @@ const LessonDetail = () => {
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-indigo-500" />
                 <h2 className="text-xl font-semibold">
-                  Current Phase: {lesson.currentPhase}
+                  Number of asked by ai: {lesson.currentPhase}
                 </h2>
               </div>
 

@@ -28,6 +28,7 @@ export const generatePitch = async (data: {
   skillLevel: string;
   phase: number;
   templateId?: string;
+  lessonId?: string;
   tone?: string;
   length?: string;
 }) => {
