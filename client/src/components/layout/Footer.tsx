@@ -31,11 +31,38 @@ export function Footer() {
 
           {/* Company */}
           <div className="space-y-4">
-            <h4 className="font-display font-semibold">Company</h4>
+            <h4 className="font-display font-semibold">About Me</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/about" className="hover:text-foreground transition-colors">About</Link></li>
-              <li><Link to="/careers" className="hover:text-foreground transition-colors">Hiring</Link></li>
-              <li><Link to="/contact" className="hover:text-foreground transition-colors">Contact</Link></li>
+              <li>
+  <a 
+    href="https://mubarek-beta.vercel.app/" 
+    className="hover:text-foreground transition-colors"
+    target="_blank" 
+    rel="noopener noreferrer"
+  >
+    About
+  </a>
+</li>
+<li>
+  <a 
+    href="https://mubarek-beta.vercel.app/" 
+    className="hover:text-foreground transition-colors"
+    target="_blank" 
+    rel="noopener noreferrer"
+  >
+    Hiring
+  </a>
+</li>
+<li>
+  <a 
+    href="https://mubarek-beta.vercel.app/" 
+    className="hover:text-foreground transition-colors"
+    target="_blank" 
+    rel="noopener noreferrer"
+  >
+    Contact
+  </a>
+</li>
             </ul>
           </div>
 
@@ -45,15 +72,15 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/login" className="hover:text-foreground transition-colors">Login</Link></li>
               <li><Link to="/register" className="hover:text-foreground transition-colors">Register</Link></li>
-              <li><Link to="/forgot-password" className="hover:text-foreground transition-colors">Reset Password</Link></li>
+              
             </ul>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2024 PitchRocket. All rights reserved.
-          </p>
+  © {new Date().getFullYear()} PitchRocket. All rights reserved.
+</p>
           <div className="flex gap-6 text-sm text-muted-foreground">
             <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
             <a href="#" className="hover:text-foreground transition-colors">Terms</a>
