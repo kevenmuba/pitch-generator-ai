@@ -28,6 +28,11 @@ generate(@Req() req, @Body() dto: GeneratePitchDto) {
     return this.pitchesService.getUserPitches(req.user.id);
   }
 
+  @Get('lesson/:lessonId')
+getByLesson(@Req() req, @Param('lessonId') lessonId: string) {
+  return this.pitchesService.getPitchesByLesson(req.user.id, lessonId);
+}
+
   @Get(':id')
   findOne(@Req() req, @Param('id') id: string) {
     return this.pitchesService.getPitchById(req.user.id, id);

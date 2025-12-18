@@ -1,3 +1,4 @@
+// src/pages/dashboard/lesson-detail.tsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -7,8 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Sparkles } from "lucide-react";
 import { getUserLessonById } from "@/services/user-lesson.service";
+import { getLessonPitches, generatePitch } from "@/services/pitch.service";
 import { useToast } from "@/hooks/use-toast";
-import { generatePitch } from "@/services/pitch.service";
 
 type UserLesson = {
   id: string;
@@ -24,15 +25,18 @@ const LessonDetail = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
   const { toast } = useToast();
 
-  const [aiPitch, setAiPitch] = useState<string | null>(null);
-const [generating, setGenerating] = useState(false);
-
   const [lesson, setLesson] = useState<UserLesson | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const [aiPitch, setAiPitch] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+
+  const [pitches, setPitches] = useState<any[]>([]);
+  const [loadingPitches, setLoadingPitches] = useState(false);
+
+  // Fetch lesson details
   const fetchLesson = async () => {
     if (!lessonId) return;
-
     setLoading(true);
     try {
       const data = await getUserLessonById(lessonId);
@@ -48,55 +52,54 @@ const [generating, setGenerating] = useState(false);
     }
   };
 
-//   const handleGeneratePitch = async () => {
-//   if (!lesson) return;
-//   setGenerating(true);
-//   try {
-//     const pitch = await generatePitch({
-//       scenario: lesson.scenario,
-//       skillLevel: lesson.skillLevel,
-//       phase: lesson.currentPhase,
-//     });
-//     setAiPitch(pitch.resultText);
-//   } catch (err: any) {
-//     console.error(err);
-//     toast({
-//       title: "Error generating pitch",
-//       description: err?.response?.data?.message || "Something went wrong",
-//     });
-//   } finally {
-//     setGenerating(false);
-//   }
-// };
+  // Fetch all pitches for the lesson
+  const fetchPitches = async () => {
+    if (!lessonId) return;
+    setLoadingPitches(true);
+    try {
+      const data = await getLessonPitches(lessonId);
+      setPitches(data);
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: "Error loading pitches",
+        description: "Unable to fetch AI-generated guidance",
+      });
+    } finally {
+      setLoadingPitches(false);
+    }
+  };
 
-
-const handleGeneratePitch = async () => {
-  if (!lesson) return;
-  setGenerating(true);
-  try {
-    const pitch = await generatePitch({
-      scenario: lesson.scenario,
-      skillLevel: lesson.skillLevel.toLowerCase(), // important!
-      phase: Number(lesson.currentPhase),         // ensure number
-      tone: "confident",                          // optional, default
-      length: "medium",                           // optional, default
-    });
-    setAiPitch(pitch.resultText);
-  } catch (err: any) {
-    console.error("Pitch generation error:", err);
-    toast({
-      title: "Error generating pitch",
-      description:
-        err?.response?.data?.message || err.message || "Something went wrong",
-    });
-  } finally {
-    setGenerating(false);
-  }
-};
-
+  // Generate pitch for the current phase
+  const handleGeneratePitch = async () => {
+    if (!lesson) return;
+    setGenerating(true);
+    try {
+      const pitch = await generatePitch({
+        scenario: lesson.scenario,
+        skillLevel: lesson.skillLevel.toLowerCase(),
+        phase: Number(lesson.currentPhase),
+        tone: "confident",
+        length: "medium",
+        lessonId: lesson.id, // important
+      });
+      setAiPitch(pitch.resultText);
+      fetchPitches(); // refresh pitch list
+    } catch (err: any) {
+      console.error("Pitch generation error:", err);
+      toast({
+        title: "Error generating pitch",
+        description:
+          err?.response?.data?.message || err.message || "Something went wrong",
+      });
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   useEffect(() => {
     fetchLesson();
+    fetchPitches();
   }, [lessonId]);
 
   const getSkillBadgeColor = (level: string) => {
@@ -131,10 +134,7 @@ const handleGeneratePitch = async () => {
     <UserDashboardLayout>
       <div className="space-y-8 max-w-4xl mx-auto">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display text-3xl font-bold capitalize">
             {lesson.scenario} Lesson
           </h1>
@@ -173,11 +173,7 @@ const handleGeneratePitch = async () => {
         </Card>
 
         {/* Phase Content */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card variant="glass">
             <CardContent className="space-y-4 p-6">
               <div className="flex items-center gap-2">
@@ -193,22 +189,48 @@ const handleGeneratePitch = async () => {
               </p>
 
               <Button className="gap-2" onClick={handleGeneratePitch} disabled={generating}>
-  <Sparkles className="w-4 h-4" />
-  {generating ? "Generating..." : "Generate AI Guide"}
-</Button>
+                <Sparkles className="w-4 h-4" />
+                {generating ? "Generating..." : "Generate AI Guide"}
+              </Button>
 
-{/* Render AI Pitch */}
-{aiPitch && (
-  <Card className="mt-4">
-    <CardContent>
-      <h3 className="text-lg font-semibold mb-2">AI Guidance:</h3>
-      <div className="whitespace-pre-wrap text-muted-foreground">
-        {aiPitch}
-      </div>
-    </CardContent>
-  </Card>
-)}
+              {/* Render AI Pitch */}
+              {aiPitch && (
+                <Card className="mt-4">
+                  <CardContent>
+                    <h3 className="text-lg font-semibold mb-2">AI Guidance:</h3>
+                    <div className="whitespace-pre-wrap text-muted-foreground">
+                      {aiPitch}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
+              {/* Render all pitches for the lesson */}
+              {loadingPitches ? (
+                <p className="text-muted-foreground mt-2">Loading previous phases...</p>
+              ) : (
+                pitches.length > 0 && (
+                  <div className="space-y-4 mt-4">
+                    {pitches.map((p) => (
+                      <Card key={p.id} variant={p.phase === lesson.currentPhase ? "default" : "outline"}>
+                        <CardContent className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-semibold">
+                              Phase {p.phase} {p.phase === lesson.currentPhase && "(Current)"}
+                            </h3>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(p.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <div className="whitespace-pre-wrap text-muted-foreground">
+                            {p.resultText}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )
+              )}
             </CardContent>
           </Card>
         </motion.div>

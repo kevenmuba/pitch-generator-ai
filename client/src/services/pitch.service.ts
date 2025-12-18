@@ -34,3 +34,12 @@ export const generatePitch = async (data: {
   const res = await api.post("/pitches/generate", data);
   return res.data; // returns generated Pitch object
 };
+
+/**
+ * 4️⃣ Get all pitches for a specific lesson
+ * GET /pitches/lesson/:lessonId
+ */
+export const getLessonPitches = async (lessonId: string) => {
+  const res = await api.get(`/pitches/lesson/${lessonId}`);
+  return res.data; // returns array of Pitch objects for the lesson
+};

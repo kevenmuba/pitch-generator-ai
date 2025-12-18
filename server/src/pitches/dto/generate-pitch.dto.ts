@@ -13,6 +13,10 @@ export class GeneratePitchDto {
 
   @IsOptional()
   @IsString()
+  lessonId?: string; // ✅ optional link to lesson
+
+  @IsOptional()
+  @IsString()
   templateId?: string;
 
   @IsOptional()
