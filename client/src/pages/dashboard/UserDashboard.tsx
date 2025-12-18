@@ -52,6 +52,7 @@ const UserDashboard = () => {
   const user = useAuthStore((state) => state.user);
   const isUnlimited = user?.name === "admin";
   const creditsRemaining = user?.credits || 0;
+  console.log("credits remaining is", creditsRemaining);
 
   const [recentLessons, setRecentLessons] = useState<any[]>([]);
   const [loadingLessons, setLoadingLessons] = useState(false);
@@ -136,7 +137,7 @@ const UserDashboard = () => {
                           Free Credits Remaining
                         </p>
                         <p className="font-display text-3xl font-bold">
-                          {creditsRemaining} / 5
+                          {creditsRemaining} 
                         </p>
                       </>
                     )}
