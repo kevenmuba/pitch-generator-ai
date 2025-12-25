@@ -22,6 +22,11 @@ export class AuthService {
     sub: user.id, 
     role: user.role,
     isUnlimited: user.isUnlimited, 
+    credits: user.credits,
+    trialCredits: user.trialCredits,
+
+
+    
   };
   return { access_token: this.jwtService.sign(payload) };
 }

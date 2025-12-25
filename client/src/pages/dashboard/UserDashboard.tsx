@@ -51,7 +51,7 @@ const quickScenarios = [
 const UserDashboard = () => {
   const user = useAuthStore((state) => state.user);
   const isUnlimited = user?.name === "admin";
-  const creditsRemaining = user?.credits || 0;
+  const creditsRemaining = user?.credits + user?.trialCredits || 0;
   console.log("credits remaining is", creditsRemaining);
 
   const [recentLessons, setRecentLessons] = useState<any[]>([]);
