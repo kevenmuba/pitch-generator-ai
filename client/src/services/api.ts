@@ -2,7 +2,7 @@ import axios from "axios";
 import { useAuthStore } from "@/store/auth.store";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000", // your NestJS backend
+  baseURL: "https://pitch-generator-ai-5.onrender.com", // your NestJS backend
 });
 
 // Automatically attach token from Zustand store
